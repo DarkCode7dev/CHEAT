@@ -1,0 +1,192 @@
+==================title.pipe.ts================
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'title'
+})
+export class TitlePipe implements PipeTransform {
+
+  transform(value: any[],args: string): any {
+    if(args == "")
+      return value;
+    var subset = value.filter(bk => bk.title.includes(args));
+    return subset;
+  }
+
+}
+================app.component.html================
+<h1>Devesh Book Store</h1><hr>
+<app-book></app-book>
+==================book.component.html================
+<div>
+    <h1>Book's List</h1>
+    <input [(ngModel)]="filter" type="search" placeholder="Search" class="search" >
+    <table border="1">
+        <tr>
+            <th>Book Id</th>
+            <th>Book Name</th>
+            <th>Book Price</th>
+            <th colspan="2">Actions</th>
+        </tr>
+        <tr *ngFor="let item of allBooks | title:filter">
+            <td>{{item.id}}</td>
+            <td>{{item.title | uppercase }}</td>
+            <td>{{item.price | currency :'INR'}}</td>
+            <td><a href="#" (click)=delete(item.id)>Delete</a></td>
+            <td><a href="#" (click)=edit(item.id)>Edit</a></td>
+        </tr>
+    </table>
+</div>
+<div>
+    <h1>New Book Registration</h1>
+    <p><input type="text" placeholder="Book Id" [(ngModel)]="id" name="bkid"></p>
+    <p><input type="text" placeholder="Book Name" [(ngModel)]="title" name="bkname"></p>
+    <p><input type="text" placeholder="Book Cost" [(ngModel)]="price" name="bkcost"></p>
+    <button (click)="addBook()">Add New Book</button>
+</div> 
+================================book.service.ts=========
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class BookService {
+  url : string  = "http://localhost:1234";
+  constructor(private http:HttpClient) { }
+ 
+  getAll() : any{
+    return this.http.get(this.url);
+  }
+
+  find(id):any{
+    let temp=this.url + "/" + id;
+    return this.http.get(temp);
+  }
+
+  postNewBook(bk) : any{
+    var post = JSON.stringify(bk);
+    return this.http.post(this.url,bk);
+  }
+
+  delete(id) : any{
+    let temp= this.url + "/" +id;
+    return this.http.delete(temp);
+  }
+}
+=========================book.component.ts=============
+import { Component, OnInit } from '@angular/core';
+import { BookService } from '../../Services/book.service';
+
+@Component({
+  selector: 'app-book',
+  templateUrl: './book.component.html',
+  styleUrls: ['./book.component.css']
+})
+export class BookComponent implements OnInit {
+  allBooks : any;
+  selectedBook : any;
+  id :number=0;
+  title :string="";
+  price :number=0;
+  filter : string="";
+  constructor(private service : BookService) { }
+
+  ngOnInit() {
+    this.allBooks = this.service.getAll();
+    this.service.getAll().subscribe((res)=>this.allBooks = res);
+  }
+
+  findEmp(id : number)
+  {
+    let observable = this.service.find(id);
+    observable.subscribe(res=>this.selectedBook == res);
+  }
+
+  addBook()
+  {
+    let bk = {"id" :this.id, "title" : this.title, "price":this.price};
+    this.service.postNewBook(bk).subscribe((res)=>{
+      alert(res);
+    })
+  }
+
+  delete(id:number)
+  {
+    this.service.delete(id).subscribe((res)=>{
+      alert(res);
+    });
+  }
+
+}
+========================MysqlDemo.js====================
+var app=require("express")();
+var util = require("util");
+var parser = require("body-parser");
+
+app.use(parser.urlencoded({extended:true}));
+app.use(parser.json());
+
+app.use((req,res,next)=>{
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Methods", "GET,PUT, POST, DELETE");
+	res.header("Access-Control-Allow-Headers", "*");
+	next();
+})
+function getConnection()
+{
+	var sql = require('mysql'); 
+    var con = sql.createConnection({
+	  database: 'meanstack',
+	  host: "localhost",
+	  user: "root",
+	  password: "root"
+	});
+    return con;
+}
+
+app.get('/', (req,res)=>{
+		var query="select * from bookstore";
+		var con=getConnection();
+		con.query(query,(err,results,fields)=>{
+		res.send(JSON.stringify(results));
+		console.log(err);
+	})
+})
+
+app.get('/:id',(req,res)=>{
+	 var id= req.params.id;
+//	 console.log(id);
+	 var query="select * from bookstore where id="+id;
+	 var con= getConnection();
+	 con.query(query,(err,results,fields)=>{
+	 	res.send(JSON.stringify(results));
+	 })
+})
+
+
+app.post("/", (req, res)=>{
+	var data = req.body;
+	console.log(data);
+	var query = util.format("Insert into bookstore values(%d, '%s', %d)", data.id, data.title, data.price);
+	var con = getConnection();
+	con.query(query, (err, results, fields)=>{
+		if(err) res.send(JSON.stringify(err));
+		res.send("Inserted successfully");
+	})
+})
+
+app.delete('/:id',(req,res)=>{
+	 var id= req.params.id;
+//	 console.log(id);
+	 var query="delete from bookstore where id="+id;
+	 var con= getConnection();
+	 con.query(query,(err,results,fields)=>{
+	 	res.send(JSON.stringify(results));
+	 })
+})
+
+
+app.listen(1234,()=>{
+    console.log("Server running at 1234");
+})
