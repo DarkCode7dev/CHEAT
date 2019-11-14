@@ -1,0 +1,308 @@
+================Student.java======================
+
+	public class Student 
+	{
+		private int id;
+		private String sname;
+		private String fname;
+		private String phoneno;
+		
+		Student(int id,String sname,String fname,String phoneno)
+		{
+			this.id=id;
+			this.sname=sname;
+			this.fname=fname;
+			this.phoneno=phoneno;
+		}
+
+		public int getId() {
+			return id;
+		}
+
+		public String getSname() {
+			return sname;
+		}
+
+		public String getFname() {
+			return fname;
+		}
+
+		public String getPhoneno() {
+			return phoneno;
+		}
+
+		@Override
+		public String toString() {
+			return String.format("%d,%s,%s,%s", id,sname,fname,phoneno);
+		}
+		
+		
+		
+	}
+
+=========================StudentDB.java=======================
+import java.sql.*;
+import java.util.ArrayList;
+
+interface IStudent
+{
+	void AddNewStudent(Student s);
+	void UpdateStudent(Student s) throws Exception;
+	void DeleteStudent(int sid) throws Exception;
+	ArrayList<Student> GetAllStudents();
+	ArrayList<Student> FindStudent(int sid);
+}
+
+public class StudentDB implements IStudent
+{
+	final static String url="jdbc:mysql://localhost:3306/javaex";
+	final static String user="root";
+	final static String pass="root";
+	
+	public Connection getConnection() throws ClassNotFoundException, SQLException
+	{
+		Class.forName("com.mysql.jdbc.Driver");
+		return DriverManager.getConnection(url, user, pass);
+	}
+	
+	public int PerformOperation(String dbquery)
+	{
+		int rowsAffected=0;
+		try 
+		{
+			Connection con=getConnection();
+			if(con==null)	MyConsole.Print("Error Connecting MySQL");
+			PreparedStatement ps=con.prepareStatement(dbquery);
+			rowsAffected=ps.executeUpdate();
+		} 
+		catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return rowsAffected;
+	}
+	
+	ArrayList<Student> sdetails=new ArrayList<Student>();
+	private ArrayList<Student> LoadRecords(String dbquery)
+	{
+		sdetails.clear();
+		try 
+		{
+			Connection con=getConnection();
+			Statement stmt=con.createStatement();
+			ResultSet rs=stmt.executeQuery(dbquery);
+			while(rs.next())
+			{
+				int id = rs.getInt(1);
+				String sname = rs.getString(2);
+				String fname = rs.getString(3);
+				String phno = rs.getString(4);
+				Student s =new Student(id, sname, fname, phno);
+				sdetails.add(s);
+			}
+		} 
+		catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return sdetails;
+	}
+
+	@Override
+	public void AddNewStudent(Student s) 
+	{
+		String dbquery="insert into student(name,fname,phno) values('"+s.getSname()+"','"+s.getFname()+"','"+ s.getPhoneno()+"')";
+		PerformOperation(dbquery);
+	}
+
+	@Override
+	public void UpdateStudent(Student s) throws Exception 
+	{
+
+		String dbquery="update student set name='"+s.getSname()+"',fname='"+s.getFname()+"', phno='"+s.getPhoneno()+"' where id="+s.getId();
+		int num = PerformOperation(dbquery);
+		if(num==0) throw new Exception(" not found");
+	}
+
+	@Override
+	public void DeleteStudent(int sid) throws Exception 
+	{
+		String dbquery="delete from student where id="+sid;
+		int rows=PerformOperation(dbquery);
+		if(rows==0)
+			throw new Exception("No Student Found");
+	}
+
+	@Override
+	public ArrayList<Student> GetAllStudents() {
+		String dbquery="select * from student";
+		LoadRecords(dbquery);
+		return sdetails;
+	}
+
+	@Override
+	public ArrayList<Student> FindStudent(int sid) {
+		String dbquery="select * from student where id="+sid;
+		LoadRecords(dbquery);
+		ArrayList<Student> temp=new ArrayList<Student>();
+		for(Student stud:sdetails)
+		{
+			if(stud.getId()==sid)
+			{
+				temp.add(stud);
+			}
+		}
+		return temp;
+	}
+
+}
+=======================StudentUI.java======================
+
+import java.util.ArrayList;
+
+
+
+public class StudentUI {
+
+//	static IStudent collections=new StudentArrayList();
+//	static IStudent collections=new StudentFileIO();
+	static IStudent collections=new StudentDB();
+	public static void main(String[] args) 
+	{
+		try 
+		{
+			boolean run=true;
+			do 
+			{
+				int choice=MyConsole.GetInt(Menu());
+				if(choice<=5 && choice!=0)
+					ProcessMenu(choice);
+				else
+					run=false;
+			}
+			while(run!=false);
+			
+		} 
+		catch (Exception e) 
+		{
+			MyConsole.Print(e.getMessage());
+		}
+	}
+
+	
+	private static void ProcessMenu(int choice) throws Exception 
+	{
+		switch(choice)
+		{
+			case 1:
+				AddStudent();
+				break;
+			case 2:
+				UpdateStudent();
+				break;
+			case 3:
+				DeleteStudent();
+				break;
+			case 4:
+				FindStudent();
+				break;
+			case 5:
+				GetAllStudents();
+				break;
+			default:
+				break;
+		}
+	}
+
+
+	private static String Menu() 
+	{
+		String menu="PRESS 1-------------------->ADD STUDENT \n";
+		menu+="PRESS 2-------------------->UPDATE STUDENT \n";
+		menu+="PRESS 3-------------------->REMOVE STUDENT \n";
+		menu+="PRESS 4-------------------->FIND STUDENT \n";
+		menu+="PRESS 5-------------------->DISPLAY ALL STUDENT \n";
+		menu+="ENTER YOUR CHOICE ANY OTHER WILL BE CONSIDERED AS EXIT";
+		return menu;
+	}
+
+
+	private static void GetAllStudents() 
+	{
+		ArrayList<Student> studDetail=collections.GetAllStudents();
+		for(Student stud:studDetail)
+			MyConsole.Print("Id:"+stud.getId()+"\t Name:"+stud.getSname()+"\t Fathers Name:"+stud.getFname()+"\t Phone Number:"+stud.getPhoneno());
+	}
+
+	private static void FindStudent() 
+	{
+		int sid=MyConsole.GetInt("Enter the Id:");
+		ArrayList<Student> studDetail=collections.FindStudent(sid);
+		for(Student stud:studDetail)
+			MyConsole.Print("Id:"+stud.getId()+"\t Name:"+stud.getSname()+"\t Fathers Name:"+stud.getFname()+"\t Phone Number:"+stud.getPhoneno());
+	}
+
+	private static void DeleteStudent() throws Exception 
+	{
+		int id=MyConsole.GetInt("Enter the Id:");
+		collections.DeleteStudent(id);
+	}
+	private static void AddStudent() 
+	{
+		int id=MyConsole.GetInt("Enter the Id:");
+		String sname=MyConsole.GetString("Enter the Student Name:");
+		String fname=MyConsole.GetString("Enter the Students Father Name:");
+		String phno=MyConsole.GetString("Enter the Students Father Mobile Number:");
+		Student student=new Student(id, sname, fname, phno);
+		collections.AddNewStudent(student);
+	}
+	private static void UpdateStudent() throws Exception 
+	{
+		int id=MyConsole.GetInt("Enter the Id:");
+		String sname=MyConsole.GetString("Enter the Student Name:");
+		String fname=MyConsole.GetString("Enter the Students Father Name:");
+		String phno=MyConsole.GetString("Enter the Students Father Mobile Number:");
+		Student student=new Student(id, sname, fname, phno);
+		collections.UpdateStudent(student);
+	}
+	
+
+}
+=================MyConsole
+import java.util.Scanner;
+
+public class MyConsole 
+{
+	private static Scanner scan=new Scanner(System.in);
+	
+	//Print the Value to User
+	static void Print(Object obj)
+	{
+		System.out.println(obj);
+	}
+	
+	//Get String Value From User
+	static String GetString(String question)
+	{
+		System.out.println(question);
+		return scan.next();
+	}
+	
+	//Get Double Value From User
+	static double GetDouble(String question)
+	{
+		System.out.println(question);
+		return scan.nextDouble();
+	}
+	
+	//Get Integer Value From User
+	static int GetInt(String question)
+	{
+		System.out.println(question);
+		return scan.nextInt();
+	}
+	
+}
