@@ -1,0 +1,52 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.ServiceModel;
+using System.Text;
+using WASServices.Models;
+
+namespace WASServices
+{
+    public class EntityService : IEntityServices
+    {
+        public void DeleteRecord(int id)
+        {
+            var context = new MyExampleEntities();
+            var emp = context.tblemployees.Find(id);
+            context.tblemployees.Remove(emp);
+            context.SaveChanges();
+        }
+
+        public List<Employee> GetEmployees()
+        {
+            var context = new MyExampleEntities();
+            List<Employee> employees = new List<Employee>();
+            foreach(var emp in context.tblemployees)
+            {
+                var temp = new Employee
+                {
+                    EmpId = emp.EmpId,
+                    EmpName = emp.EmpName,
+                    EmpAddress = emp.EmpAddress
+                };
+                employees.Add(temp);
+            }
+            return employees;
+        }
+
+        public void InsertRecord(Employee emp)
+        {
+            var context = new MyExampleEntities();
+            var temp = new tblemployee
+            {
+                EmpId = emp.EmpId,
+                EmpName = emp.EmpName,
+                EmpAddress = emp.EmpAddress
+            };
+            context.tblemployees.Add(temp);
+            context.SaveChanges();
+
+        }
+    }
+}
