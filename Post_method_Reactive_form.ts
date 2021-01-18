@@ -85,3 +85,130 @@ export class CreateComponent implements OnInit {
   }
 }
 
+===========================Component.Html========================
+  <h1>{{item}}</h1>
+<div class="form-group col-md-7">
+<form [formGroup]="reactiveForm"  style="color:green"(ngSubmit)="onSubmit()">
+  <div class="form-group">
+    <!-- <label  class="control-label" style="margin-right:10px">ID: </label> -->
+  </div>
+  <div class="form-group">
+    <input type="hidden"
+      [ngClass]="{
+        'is-invalid':
+        reactiveForm.get('GMId').errors &&
+        reactiveForm.get('GMId').touched
+      }"
+      class="form-control"
+      placeholder="Known as"
+      formControlName="GMId"
+    />
+    <div
+      class="invalid-feedback"
+      *ngIf="
+      reactiveForm.get('cardOwnerName').touched &&
+      reactiveForm.get('cardOwnerName').hasError('required')">
+    Card Owner Name as is required
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label" style="margin-right:10px">Card Owner Name: </label>
+  </div>
+  <div class="form-group">
+    <input
+      [ngClass]="{
+        'is-invalid':
+        reactiveForm.get('cardOwnerName').errors &&
+        reactiveForm.get('cardOwnerName').touched
+      }"
+      class="form-control"
+      placeholder="Known as"
+      formControlName="cardOwnerName"
+    />
+    <div
+      class="invalid-feedback"
+      *ngIf="
+      reactiveForm.get('cardOwnerName').touched &&
+      reactiveForm.get('cardOwnerName').hasError('required')
+      "
+    >
+    Card Owner Name as is required
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label" style="margin-right:10px">Card Number: </label>
+
+  </div>
+  <div class="form-group">
+    <input
+      [ngClass]="{
+        'is-invalid':
+        reactiveForm.get('cardNumber').errors &&
+        reactiveForm.get('cardNumber').touched
+      }"
+      class="form-control"
+      placeholder="Known as"
+      formControlName="cardNumber"
+    />
+    <div
+      class="invalid-feedback"
+      *ngIf="
+      reactiveForm.get('cardNumber').touched &&
+      reactiveForm.get('cardNumber').hasError('required')
+      "
+    >
+    Card Number Name as is required
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label class="control-label" style="margin-right:10px">Expiration Date: </label>
+
+  </div>
+  <div class="form-group">
+    <input
+      [ngClass]="{
+        'is-invalid':
+        reactiveForm.get('expiryDate').errors &&
+        reactiveForm.get('expiryDate').touched
+      }"
+      class="form-control"
+      placeholder="expirationDate"
+      formControlName="expiryDate"
+    />
+    <div
+      class="invalid-feedback"
+      *ngIf="
+      reactiveForm.get('expiryDate').touched &&
+      reactiveForm.get('expiryDate').hasError('required')
+      "
+    >
+    Card Owner Name as is required
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label" style="margin-right:10px">Money: </label>
+
+  </div>
+  <div class="form-group">
+    <input
+    [ngClass]="{
+      'is-invalid':
+      reactiveForm.get('amount').errors &&
+      reactiveForm.get('amount').touched
+    }"
+      class="form-control"
+      placeholder="money"
+      formControlName="amount"
+    />
+    <div
+      class="invalid-feedback"
+      *ngIf="reactiveForm.get('money').touched && reactiveForm.get('money').hasError('required')"
+    >
+    Money is required
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary"  (click)="callGreet()">Save</button>
+
+</form>
+</div>
