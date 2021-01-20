@@ -1,0 +1,71 @@
+Common Service===========================================================================================================
+import { User } from './user';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CommonService {
+
+  constructor(private http: HttpClient) { }
+
+  readonly rootURL = 'https://localhost:44370/api';
+  headers={
+    headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+    })
+}
+  deleteDetail(id) {
+    return this.http.delete(this.rootURL + '/Detail/MemberDeleteDetail/'+ id);
+  }
+}
+===========================================================================================================Component.TS
+import { CommonService } from './../common.service';
+import { Component, OnInit } from '@angular/core';
+
+
+@Component({
+  selector: 'app-customers',
+  templateUrl: './customers.component.html',
+  styleUrls: ['./customers.component.css']
+})
+export class CustomersComponent implements OnInit {
+
+
+  constructor(private service: CommonService) {}
+
+  ngOnInit() {
+   
+  }
+  onDelete(j){
+   this.service.deleteDetail(j).subscribe(data=>{
+    console.log(data);
+   })
+  }
+
+}
+=====================================================COMPONENT.HTML============================================
+<table class="table table-dark" border="1" style="color:black">
+   <tr>
+     <td>GMId </td>
+     <td>CardOwnerName </td>
+     <td>CardNumber </td>
+     <td>expiryDate </td>
+     <td>amount </td>
+     <td>Delete</td>
+   </tr>
+   <tr *ngFor="let item of userdata">
+    <td>{{item.GMId}} </td>
+    <td>{{item.CardOwnerName}} </td>
+    <td>{{item.CardNumber}} </td>
+    <td> {{item.ExpiryDate}}</td>
+    <td>{{item.Amount}} </td>
+    <td><a (click)="onDelete(item.GMId)">X</a></td>
+  </tr>
+</table>
+
+
+
+
+
