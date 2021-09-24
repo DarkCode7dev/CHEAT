@@ -1,0 +1,12 @@
+<H1>Employee Members</H1>
+<table class="table table-hover">
+  <tr *ngFor="let pd of service.list| paginate: { itemsPerPage: 5, currentPage: p }">
+    <td (click)="populateForm(pd)">{{pd.EmployeeName}}</td>
+    <td (click)="populateForm(pd)">{{pd.Technology}}</td>
+    <td>
+      <i class="far fa-trash-alt fa-lg text-danger" (click)="onDelete(pd.EmployeeId)"></i>
+    </td>
+  </tr>
+</table>
+
+<pagination-controls (pageChange)="p = $event"></pagination-controls>
