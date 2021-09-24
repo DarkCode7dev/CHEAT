@@ -1,0 +1,39 @@
+<form [formGroup]="form" autocomplete="off" (submit)="onSubmit(form)">
+  <input type="hidden" name="EmployeeId" [value]="service.formData.EmployeeId">
+  <div class="form-group">
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <div class="input-group-text bg-white">
+          <i class="fas fa-user-circle" ></i>
+        </div>
+      </div>
+      <input formControlName="EmployeeName"   class="form-control"
+        placeholder="Employee Name" required [value]="service.formData.EmployeeName">
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <div class="input-group-text bg-white">
+          <i class="far fa-credit-card" ></i>
+        </div>
+      </div>
+      <input formControlName="Technology" 
+      class="form-control" placeholder="Technology" required [value]="service.formData.Technology">
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="input-group">
+      <div class="input-group-prepend">
+        <div class="input-group-text bg-white">
+          <i class="fas fa-user-circle" ></i>
+        </div>
+      </div>
+      <input type="password" formControlName="Password"   class="form-control"
+        placeholder="Password" required [value]="service.formData.Password">
+    </div>
+  </div>
+  <div class="form-group">
+    <button class="btn btn-success btn-lg btn-block" type="submit" ><i class="fas fa-database"></i> Submit</button>
+  </div>
+</form>
