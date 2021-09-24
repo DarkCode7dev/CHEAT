@@ -1,0 +1,49 @@
+<button routerLink="/help" routerLinkActive="active">Help</button>
+<!-- <a class="nav-link" (click)="logout()">Logout</a> -->
+<button (click)="logout()">Logout</button>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+ 
+  <div *ngIf="loggedIn()" class="dropdown">
+    <a class="dropdown-toggle text-light">
+      Welcome User <a class="nav-link" (click)="logout()">Logout</a>
+    </a>
+  </div>  
+</nav>
+<mat-card>
+  <mat-card-content>
+    <div class="header">
+      <P>Sign Into Your Account </P>
+    </div>
+    <form
+    #loginForm="ngForm"
+    class="form my-2 my-lg-0"
+    (ngSubmit)="login()"
+  >
+    <input
+      class="form-control mr-sm-2"
+      type="text"
+      placeholder="EmployeeName"
+      name="EmployeeName"
+      required
+      [(ngModel)]="model.EmployeeName"
+    />
+    <input
+      class="form-control mr-sm-2"
+      type="password"
+      placeholder="Password"
+      name="password"
+      required
+      [(ngModel)]="model.password"
+    />
+    <button
+      [disabled]="!loginForm.valid"
+      class="btn btn-success my-2 my-sm-0"
+      type="submit" 
+    >
+      Login
+    </button>
+  </form>
+
+  
+  </mat-card-content>
+</mat-card> 
