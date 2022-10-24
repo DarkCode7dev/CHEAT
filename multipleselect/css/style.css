@@ -1,0 +1,26 @@
+label{
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 5px;
+}
+
+body{
+    font-family: arial;
+    font-size: 16px;
+    margin: 0;
+    background: #0276ad;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#multipleSelect{
+    max-width: 100%;
+    width: 350px;
+}
+
+/* .vscomp-toggle-button{
+
+} */
