@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/virtual-select.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script type="text/javascript" src="js/virtual-select.min.js"></script>
+   
+</head>
+<body>
+    <div>   
+        <label for="">Multiple Select</label>
+        <select id="multipleSelect" multiple name="native-select" placeholder="Native Select" data-search="false" data-silent-initial-value-set="true">
+            <option value="1" disabled>Option 1</option>
+            <option value="2">Option 2</option>
+            <option value="3" selected>Option 3</option>
+            ...
+          </select>
+    </div>
+   <script type="text/javascript">
+    VirtualSelect.init({ 
+  ele: '#multipleSelect' 
+});
+   </script>
+   
+  
+</body>
+</html>
