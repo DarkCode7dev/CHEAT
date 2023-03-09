@@ -1,0 +1,28 @@
+$(document).ready(function() {
+  $('#example').DataTable({
+    responsive: true,
+    autoWidth: false,
+    columns: [
+      // specify your table columns here
+    ]
+  });
+});
+
+// add a listener for window resize events
+$(window).resize(function() {
+  // get the current screen width
+  var width = $(window).width();
+
+  // check if the screen width is less than 100% or the window is minimized
+  if (width < $(document).width() || document.hidden) {
+    // disable autoWidth property
+    $('#example').DataTable().settings()[0].autoWidth = false;
+    // redraw the table
+    $('#example').DataTable().draw();
+  } else {
+    // enable autoWidth property
+    $('#example').DataTable().settings()[0].autoWidth = true;
+    // redraw the table
+    $('#example').DataTable().draw();
+  }
+});
