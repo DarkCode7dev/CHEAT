@@ -1,76 +1,33 @@
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.7.0/css/buttons.dataTables.min.css">
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.7.0/js/dataTables.buttons.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.html5.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.print.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.7.0/js/buttons.colVis.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/select/1.3.3/js/dataTables.select.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/editor/1.9.7/js/dataTables.editor.min.js"></script>
+[HttpGet]
+        public IActionResult CompressFiles(string paths)
+        {
+            var fileNames = paths.Split(',').Select(x => x.Trim()).ToArray();
+            if (fileNames.Length == 0)
+            {
+                return BadRequest("No files were specified");
+            }
 
-
-
-
-
-
-
-
-
-
-
-
-
-$(document).ready(function() {
-    var editor = new $.fn.dataTable.Editor( {
-        ajax: "your_server_side_script.php",
-        table: "#example",
-        fields: [ {
-            label: "File Upload:",
-            name: "file",
-            type: "upload",
-            display: function ( file_id ) {
-                return '<img src="'+editor.file( 'files', file_id ).web_path+'"/>';
-            },
-            clearText: "Clear",
-            noImageText: "No image",
-            uploadText: "Upload image",
-            replaceText: "Replace",
-            uploadUrl: "/your/upload/handler"
-        } ]
-    } );
-
-    $('#example').DataTable( {
-        dom: 'Bfrtip',
-        buttons: [
-            'copy', 'csv', 'excel', 'pdf', 'print'
-        ],
-        select: true,
-        serverSide: true,
-        processing: true,
-        ajax: "your_server_side_script.php",
-        columns: [
-            { data: "name" },
-            { data: "position" },
-            { data: "office" },
-            { data: "age" },
-            { data: "start_date" },
-            { data: "salary" },
-            { data: "file", render: function ( data, type, row ) {
-                if ( data && data.file_id ) {
-                    return editor.file( 'files', data.file_id ).filename;
+            var memoryStream = new MemoryStream();
+            using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+            {
+                foreach (var fileName in fileNames)
+                {
+                    var fileInfo = new FileInfo(fileName);
+                    if (fileInfo.Exists)
+                    {
+                        var entryName = Path.GetFileName(fileName);
+                        var entry = archive.CreateEntry(entryName);
+                        using (var stream = entry.Open())
+                        {
+                            using (var fileStream = fileInfo.OpenRead())
+                            {
+                                fileStream.CopyTo(stream);
+                            }
+                        }
+                    }
                 }
-                return '';
-            } }
-        ],
-        rowId: 'id',
-        editable: true,
-        editOpts: {
-            buttons: [
-                { label: 'Cancel', fn: function () { this.close(); } },
-                { label: 'Save',   fn: function () { this.submit(); } }
-            ]
-        },
-        editor: editor
-    } );
-} );
+            }
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            return File(memoryStream, "application/zip", "files.zip");
+        }
