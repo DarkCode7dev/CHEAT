@@ -31,3 +31,28 @@
             memoryStream.Seek(0, SeekOrigin.Begin);
             return File(memoryStream, "application/zip", "files.zip");
         }
+
+
+
+
+==========================
+columns: [
+        // Define your other columns here
+        {
+            // Define your custom column
+            data: 'zip_files',
+            title: 'Zip Files',
+            render: function (data, type, full, meta) {
+                // Create a link to download the zip folder
+                var zipLink = '<a href="path/to/zip/folder" download>Download Zip Folder</a>';
+                
+                // Return the link if the column is being displayed
+                if (type === 'display') {
+                    return zipLink;
+                }
+                
+                // Return the raw data for sorting/filtering
+                return data;
+            }
+        }
+    ]
